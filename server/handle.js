@@ -170,8 +170,19 @@ async function handleBlob(request) {
   }
 }
 
+function requestUrl(request) {
+  const raw = request.url || '/'
+  try {
+    return new URL(raw)
+  } catch {
+    const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost'
+    const proto = request.headers.get('x-forwarded-proto') || 'https'
+    return new URL(raw, `${proto}://${host}`)
+  }
+}
+
 export async function handle(request) {
-  const url = new URL(request.url)
+  const url = requestUrl(request)
   const parts = url.pathname.split('/').filter(Boolean)
   if (parts[0] !== 'api') return error('NOT_FOUND', 'Not found.', 404)
   const method = request.method

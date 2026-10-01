@@ -1,16 +1,37 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { Pool } from '@neondatabase/serverless'
 import { createId } from './http.js'
 
+const PHOTO_COLUMNS = `id, journey_id, moment_id, blob_url, filename, taken_at, latitude, longitude, width, height, vision_description, is_representative, is_cover, created_at`
+
 let pool
+let schemaReady
 
 function getPool() {
   if (!pool) pool = new Pool({ connectionString: process.env.DATABASE_URL })
   return pool
 }
 
+async function ensureSchema() {
+  if (!schemaReady) {
+    schemaReady = (async () => {
+      const file = fileURLToPath(new URL('../db/migrations/001_init.sql', import.meta.url))
+      const sql = await readFile(file, 'utf8')
+      const client = getPool()
+      await client.query(sql)
+      await client.query('ALTER TABLE photos ADD COLUMN IF NOT EXISTS content bytea')
+    })().catch((err) => {
+      schemaReady = null
+      throw err
+    })
+  }
+  return schemaReady
+}
+
 async function query(text, params = []) {
+  await ensureSchema()
   const result = await getPool().query(text, params)
   return result.rows
 }
@@ -54,7 +75,7 @@ async function hydrate(journey) {
   const [dayRows, momentRows, photoRows, placeRows, memoryRows, shareRows] = await Promise.all([
     query('SELECT * FROM days WHERE journey_id = $1 ORDER BY day_number ASC', [journey.id]),
     query('SELECT * FROM moments WHERE journey_id = $1 ORDER BY started_at ASC NULLS LAST', [journey.id]),
-    query('SELECT * FROM photos WHERE journey_id = $1 ORDER BY taken_at ASC NULLS LAST', [journey.id]),
+    query(`SELECT ${PHOTO_COLUMNS} FROM photos WHERE journey_id = $1 ORDER BY taken_at ASC NULLS LAST`, [journey.id]),
     query('SELECT * FROM places WHERE journey_id = $1', [journey.id]),
     query(
       `SELECT memories.* FROM memories
@@ -163,7 +184,11 @@ export const neonRepo = {
   async addPhoto({ journeyId, bytes, blobUrl, filename, takenAt, latitude, longitude, width, height }) {
     const id = createId()
     let url = blobUrl
-    if (bytes) {
+    let content = null
+    if (bytes && process.env.VERCEL) {
+      url = `/api/media/${id}`
+      content = bytes
+    } else if (bytes) {
       const { mkdir, writeFile } = await import('node:fs/promises')
       const blobDir = path.resolve('data/blobs')
       await mkdir(blobDir, { recursive: true })
@@ -172,25 +197,28 @@ export const neonRepo = {
     }
     const rows = await query(
       `INSERT INTO photos
-        (id, journey_id, blob_url, filename, taken_at, latitude, longitude, width, height)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-       RETURNING *`,
-      [id, journeyId, url, filename || 'photo', takenAt, latitude, longitude, width, height],
+        (id, journey_id, blob_url, filename, taken_at, latitude, longitude, width, height, content)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+       RETURNING ${PHOTO_COLUMNS}`,
+      [id, journeyId, url, filename || 'photo', takenAt, latitude, longitude, width, height, content],
     )
     return mapPhoto(rows[0])
   },
 
   async listPhotos(journeyId) {
-    const rows = await query('SELECT * FROM photos WHERE journey_id = $1', [journeyId])
+    const rows = await query(`SELECT ${PHOTO_COLUMNS} FROM photos WHERE journey_id = $1`, [journeyId])
     return rows.map(mapPhoto)
   },
 
   async getPhoto(id) {
-    const rows = await query('SELECT * FROM photos WHERE id = $1', [id])
+    const rows = await query(`SELECT ${PHOTO_COLUMNS} FROM photos WHERE id = $1`, [id])
     return rows[0] ? mapPhoto(rows[0]) : null
   },
 
   async readPhotoBytes(id) {
+    const rows = await query('SELECT content FROM photos WHERE id = $1', [id])
+    const content = rows[0]?.content
+    if (content) return Buffer.isBuffer(content) ? content : Buffer.from(content)
     try {
       return await readFile(path.resolve('data/blobs', id))
     } catch {
