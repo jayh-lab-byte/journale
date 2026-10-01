@@ -130,14 +130,16 @@ async function readPhotoMeta(request) {
   if (!file || typeof file.arrayBuffer !== 'function') {
     return { invalid: 'Choose a photo to upload.' }
   }
-  if (file.type && !IMAGE_TYPES.has(file.type)) {
+  const filename = cleanText(file.name || meta.filename || 'photo', 180)
+  const knownExt = /\.(jpe?g|png|heic|heif)$/i.test(filename)
+  if (file.type && !IMAGE_TYPES.has(file.type) && !(file.type === 'application/octet-stream' && knownExt)) {
     return { invalid: 'Use a JPG or PNG photo. HEIC is attempted when the browser can read it.' }
   }
   if (file.size > 20 * 1024 * 1024) return { invalid: 'Each photo needs to be under 20 MB.' }
   const bytes = Buffer.from(await file.arrayBuffer())
   return {
     bytes,
-    filename: cleanText(file.name || meta.filename || 'photo', 180),
+    filename,
     takenAt: typeof meta.takenAt === 'string' ? meta.takenAt : null,
     latitude: numberOrNull(meta.latitude),
     longitude: numberOrNull(meta.longitude),

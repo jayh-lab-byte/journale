@@ -17,7 +17,7 @@ export function Create() {
     const oversized = []
     const accepted = []
     for (const file of incoming) {
-      if (file.size > 20 * 1024 * 1024) {
+      if (file.size > 40 * 1024 * 1024) {
         oversized.push(file.name)
         continue
       }
@@ -37,7 +37,7 @@ export function Create() {
       })
     }
     setItems((current) => [...current, ...accepted])
-    if (oversized.length) setMessage(`${oversized.length} photo${oversized.length === 1 ? '' : 's'} skipped. Each photo needs to be under 20 MB.`)
+    if (oversized.length) setMessage(`${oversized.length} photo${oversized.length === 1 ? '' : 's'} skipped. Each original photo needs to be under 40 MB.`)
     else if (rejected.length) setMessage(`${rejected.length} file${rejected.length === 1 ? '' : 's'} skipped. Use JPG, PNG, or HEIC.`)
     else setMessage('')
   }
@@ -86,7 +86,7 @@ export function Create() {
               }}
             />
           </label>
-          <p className="faint">JPG and PNG work best. Each photo can be up to 20 MB. HEIC is attempted, and a photo that cannot be read is skipped without failing the journey.</p>
+          <p className="faint">JPG and PNG work best. Originals are read on this device, then shown at up to 1920 pixels wide. HEIC is attempted, and a photo that cannot be read is skipped without failing the journey.</p>
         </div>
       </div>
       {message ? <Notice>{message}</Notice> : null}

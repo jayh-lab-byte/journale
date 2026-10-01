@@ -69,7 +69,8 @@ export function Reconstruct() {
       setStatus(problems.length ? 'partial' : 'completed')
       clearDraft()
       if (problems.length) {
-        setError(`${problems.length} photo${problems.length === 1 ? '' : 's'} could not be uploaded. The rest of the journey was kept.`)
+        const detail = problems.map((item) => `${item.name}: ${item.message}`).join(' · ')
+        setError(`${problems.length} photo${problems.length === 1 ? '' : 's'} could not be uploaded (${detail}). The rest of the journey was kept.`)
       }
       return { journey: result.journey, failed: problems, status: problems.length ? 'partial' : 'completed' }
     } catch (err) {
