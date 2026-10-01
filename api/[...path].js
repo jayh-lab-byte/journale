@@ -9,12 +9,16 @@ function expandNestedPath(request) {
   const raw = request.url || ''
   const qIndex = raw.indexOf('?')
   if (qIndex === -1) return
+  const path = raw.slice(0, qIndex)
   const params = new URLSearchParams(raw.slice(qIndex + 1))
   const parts = params.getAll('rest')
   if (!parts.length) return
+  const rest = parts.join('/')
   params.delete('rest')
   const extra = params.toString()
-  request.url = `${raw.slice(0, qIndex)}/${parts.join('/')}${extra ? `?${extra}` : ''}`
+  const suffix = `/${rest}`
+  const next = path.endsWith(suffix) ? path : `${path}${suffix}`
+  request.url = `${next}${extra ? `?${extra}` : ''}`
 }
 
 export default function handler(request, response) {
