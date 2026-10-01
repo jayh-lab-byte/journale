@@ -22,6 +22,7 @@ async function ensureSchema() {
       const client = getPool()
       await client.query(sql)
       await client.query('ALTER TABLE photos ADD COLUMN IF NOT EXISTS content bytea')
+      await client.query('ALTER TABLE memories ADD COLUMN IF NOT EXISTS suggestion text')
       await client.query(`CREATE TABLE IF NOT EXISTS photo_chunks (
         upload_id text NOT NULL,
         journey_id uuid NOT NULL REFERENCES journeys (id) ON DELETE CASCADE,
@@ -114,6 +115,7 @@ async function hydrate(journey) {
     momentId: row.moment_id,
     question: row.question,
     answer: row.answer,
+    suggestion: row.suggestion || '',
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }))
@@ -409,6 +411,15 @@ export const neonRepo = {
       if (moment) return moment
     }
     return null
+  },
+
+  async setMemoryPrompt(momentId, memoryId, { question, suggestion }) {
+    await query(
+      `UPDATE memories
+       SET question = $3, suggestion = $4, updated_at = now()
+       WHERE id = $1 AND moment_id = $2`,
+      [memoryId, momentId, question, suggestion],
+    )
   },
 
   async saveMemory(momentId, { question, answer }) {

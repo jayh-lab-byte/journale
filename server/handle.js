@@ -1,7 +1,7 @@
 import { loadEnvFile } from './env.js'
 import { cleanText, createToken, error, hashSecret, json, ownerHashFrom } from './http.js'
 import { getRepo } from './repo.js'
-import { reconstructJourney, regenerateMomentStory } from './reconstruct.js'
+import { reconstructJourney, regenerateMomentStory, draftInterviewPrompt } from './reconstruct.js'
 
 loadEnvFile()
 
@@ -66,6 +66,7 @@ export function presentJourney(journey, { readOnly = false } = {}) {
           id: memory.id,
           question: memory.question,
           answer: memory.answer,
+          suggestion: memory.suggestion || '',
         })),
       })),
     })),
@@ -239,6 +240,9 @@ export async function handle(request) {
     }
     if (parts[1] === 'moments' && parts[2] && parts.length === 3 && method === 'PATCH') {
       return patchMoment(request, parts[2])
+    }
+    if (parts[1] === 'moments' && parts[3] === 'prompt' && method === 'POST') {
+      return draftPrompt(request, parts[2])
     }
     if (parts[1] === 'moments' && parts[3] === 'memory' && method === 'POST') {
       return saveMemory(request, parts[2])
@@ -428,6 +432,36 @@ async function patchMoment(request, id) {
     patch.locationConfidence = body.locationConfidence
   }
   await repo.updateMoment(id, patch)
+  const journey = await repo.getJourney(moment.journeyId)
+  return json({ journey: presentJourney(journey) })
+}
+
+async function draftPrompt(request, id) {
+  const { repo, error: configError } = repoOrError()
+  if (configError) return configError
+  const moment = await repo.getMoment(id)
+  if (!moment) return error('NOT_FOUND', 'Moment not found.', 404)
+  const owned = await ownedJourney(request, moment.journeyId)
+  if (owned.response) return owned.response
+  const form = await request.formData()
+  const memory = moment.memories.find((item) => item.id === form.get('memoryId'))
+  if (!memory || memory.answer != null) return error('NOT_FOUND', 'Question not found.', 404)
+  if (memory.suggestion) {
+    const journey = await repo.getJourney(moment.journeyId)
+    return json({ journey: presentJourney(journey) })
+  }
+  const file = form.get('file')
+  let bytes = null
+  if (file && typeof file.arrayBuffer === 'function' && file.size <= 2 * 1024 * 1024) {
+    bytes = Buffer.from(await file.arrayBuffer())
+  }
+  let prompt = null
+  try {
+    prompt = await draftInterviewPrompt({ title: moment.title, bytes })
+  } catch {
+    prompt = null
+  }
+  if (prompt) await repo.setMemoryPrompt(id, memory.id, prompt)
   const journey = await repo.getJourney(moment.journeyId)
   return json({ journey: presentJourney(journey) })
 }

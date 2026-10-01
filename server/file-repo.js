@@ -347,6 +347,19 @@ export const fileRepo = {
     })
   },
 
+  async setMemoryPrompt(momentId, memoryId, { question, suggestion }) {
+    return withLock(async () => {
+      const store = await readStore()
+      const memory = store.memories.find((item) => item.id === memoryId && item.momentId === momentId)
+      if (!memory) return null
+      memory.question = question
+      memory.suggestion = suggestion
+      memory.updatedAt = now()
+      await writeStore(store)
+      return memory
+    })
+  },
+
   async saveMemory(momentId, { question, answer }) {
     return withLock(async () => {
       const store = await readStore()

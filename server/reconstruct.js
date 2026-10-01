@@ -129,6 +129,50 @@ function applyModelStories(days, parsed) {
   return String(parsed.title || '').slice(0, 120)
 }
 
+export async function draftInterviewPrompt({ title, bytes }) {
+  if (!process.env.OPENAI_API_KEY) return null
+  const content = [
+    {
+      type: 'text',
+      text: `Place label: ${title || 'Unknown place'}. Look at the photograph and write one interview question plus a draft answer.`,
+    },
+  ]
+  if (bytes?.length) {
+    content.push({
+      type: 'image_url',
+      image_url: { url: `data:image/jpeg;base64,${Buffer.from(bytes).toString('base64')}` },
+    })
+  }
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      'content-type': 'application/json',
+    },
+    signal: AbortSignal.timeout(20000),
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      temperature: 0.4,
+      response_format: { type: 'json_object' },
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You help a traveler remember a stop from one photograph. Return JSON with question and suggestion. The question is one short sentence about what is in the photo: a meal asks how it tasted, a view asks what they noticed, people ask who they were with, a street asks what they did there. Do not ask about time gaps or missing photos. The suggestion is a first-person draft of one or two sentences the traveler can edit. Base it on what is visible, and where taste or feeling is not visible, offer a gentle likely note rather than a blank. Do not invent names.',
+        },
+        { role: 'user', content },
+      ],
+    }),
+  })
+  if (!response.ok) return null
+  const data = await response.json()
+  const parsed = JSON.parse(data.choices?.[0]?.message?.content || '{}')
+  const question = String(parsed.question || '').trim().slice(0, 240)
+  const suggestion = String(parsed.suggestion || '').trim().slice(0, 600)
+  if (!question || !suggestion) return null
+  return { question, suggestion }
+}
+
 export async function reconstructJourney(journeyId) {
   const repo = getRepo()
   const photos = await repo.listPhotos(journeyId)

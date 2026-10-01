@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../lib/api.js'
 import { formatDayLabel, formatTime } from '../lib/format.js'
+import { shrinkForPrompt } from '../lib/resize.js'
 import { Notice } from '../components/Shell.jsx'
 
 export function Interview() {
@@ -12,7 +13,9 @@ export function Interview() {
   const [answer, setAnswer] = useState('')
   const [index, setIndex] = useState(0)
   const [pending, setPending] = useState(false)
+  const [drafting, setDrafting] = useState(false)
   const [note, setNote] = useState('')
+  const edited = useRef(false)
 
   useEffect(() => {
     api(`/api/journeys/${id}`)
@@ -36,6 +39,44 @@ export function Interview() {
       )
     : []
   const current = questions[Math.min(index, Math.max(questions.length - 1, 0))]
+
+  useEffect(() => {
+    if (!current) return undefined
+    edited.current = false
+    if (current.suggestion) {
+      setAnswer(current.suggestion)
+      return undefined
+    }
+    let cancelled = false
+    setDrafting(true)
+    setAnswer('')
+    const photo = current.moment.photos?.find((item) => item.isRepresentative) || current.moment.photos?.[0]
+    const form = new FormData()
+    form.append('memoryId', current.id)
+    shrinkForPrompt(photo?.url || '')
+      .catch(() => null)
+      .then((file) => {
+        if (cancelled) return null
+        if (file) form.append('file', file)
+        return api(`/api/moments/${current.moment.id}/prompt`, { method: 'POST', form })
+      })
+      .then((data) => {
+        if (cancelled || !data?.journey) return
+        setJourney(data.journey)
+        const suggestion = data.journey.days
+          .flatMap((day) => day.moments)
+          .flatMap((moment) => moment.memories || [])
+          .find((memory) => memory.id === current.id)?.suggestion
+        if (suggestion && !edited.current) setAnswer(suggestion)
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setDrafting(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [current?.id])
 
   async function submit(skip) {
     if (!current) return
@@ -95,19 +136,23 @@ export function Interview() {
             }}
           >
             <p className="meta">Question {Math.min(index, questions.length - 1) + 1} of {questions.length}</p>
-            <h2>{current.question}</h2>
+            <h2>{drafting && !current.suggestion ? 'Looking at this photo…' : current.question}</h2>
             <label className="stack">
-              <span className="meta">Your note</span>
+              <span className="meta">Suggested answer</span>
               <textarea
                 value={answer}
-                onChange={(event) => setAnswer(event.target.value)}
+                onChange={(event) => {
+                  edited.current = true
+                  setAnswer(event.target.value)
+                }}
                 maxLength={2000}
-                placeholder="A place, a person, or a detail you remember."
+                placeholder="A draft will appear from the photo. Change anything that isn't right."
               />
+              <span className="faint">Written from the photo. Edit anything that isn't right, then save.</span>
             </label>
             <div className="actions">
-              <button className="button" type="submit" disabled={pending}>Save</button>
-              <button className="ghost" type="button" disabled={pending} onClick={() => submit(true)}>Skip</button>
+              <button className="button" type="submit" disabled={pending || drafting}>Save</button>
+              <button className="ghost" type="button" disabled={pending || drafting} onClick={() => submit(true)}>Skip</button>
               <Link className="text-link" to={`/journeys/${id}`}>Back to Story</Link>
             </div>
           </form>
