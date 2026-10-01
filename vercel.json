@@ -2,6 +2,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
+    { "source": "/api/:first/:rest*", "destination": "/api/:first?rest=:rest*" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
