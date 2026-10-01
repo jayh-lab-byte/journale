@@ -33,7 +33,7 @@ async function reverseGeocode(latitude, longitude) {
   url.searchParams.set('format', 'json')
   const response = await fetch(url, {
     headers: { 'user-agent': 'Journale/0.1 (educational travel storybook)', accept: 'application/json' },
-    signal: AbortSignal.timeout(8000),
+    signal: AbortSignal.timeout(4000),
   })
   if (!response.ok) return ''
   const data = await response.json()
@@ -43,6 +43,7 @@ async function reverseGeocode(latitude, longitude) {
 async function namePlaces(days) {
   const cache = new Map()
   let named = 0
+  let lookups = 0
   for (const day of days) {
     for (const moment of day.moments) {
       if (!hasGps(moment)) {
@@ -51,12 +52,17 @@ async function namePlaces(days) {
       }
       const key = `${moment.latitude.toFixed(3)},${moment.longitude.toFixed(3)}`
       if (!cache.has(key)) {
-        try {
-          cache.set(key, await reverseGeocode(moment.latitude, moment.longitude))
-        } catch {
+        if (lookups >= 12) {
           cache.set(key, '')
+        } else {
+          lookups += 1
+          try {
+            cache.set(key, await reverseGeocode(moment.latitude, moment.longitude))
+          } catch {
+            cache.set(key, '')
+          }
+          await delay(250)
         }
-        await delay(250)
       }
       const name = cache.get(key)
       moment.title = name || 'Pinned location'
@@ -87,7 +93,7 @@ async function describePhoto(photo, bytes) {
       authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       'content-type': 'application/json',
     },
-    signal: AbortSignal.timeout(30000),
+    signal: AbortSignal.timeout(12000),
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       temperature: 0,
@@ -193,12 +199,19 @@ export async function reconstructJourney(journeyId) {
   await namePlaces(days)
   const photoVision = []
   if (process.env.OPENAI_API_KEY) {
+    let described = 0
     for (const day of days) {
+      if (described >= 4) break
       for (const moment of day.moments) {
+        if (described >= 4) break
         const photo = moment.photos.find((item) => item.id === moment.representativeId) || moment.photos[0]
         if (!photo) continue
         try {
+          const size = typeof repo.photoByteLength === 'function' ? await repo.photoByteLength(photo.id) : 0
+          if (size > 900_000) continue
           const bytes = photo.blobUrl?.startsWith('/api/media/') ? await repo.readPhotoBytes(photo.id) : null
+          if (bytes && bytes.length > 900_000) continue
+          described += 1
           const description = await describePhoto(photo, bytes)
           if (description) {
             photo.visionDescription = description

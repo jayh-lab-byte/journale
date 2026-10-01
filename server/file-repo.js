@@ -227,6 +227,16 @@ export const fileRepo = {
     await rm(dir, { recursive: true, force: true })
   },
 
+  async photoByteLength(id) {
+    try {
+      const { stat } = await import('node:fs/promises')
+      const info = await stat(path.join(blobDir, id))
+      return info.size
+    } catch {
+      return 0
+    }
+  },
+
   async readPhotoBytes(id) {
     try {
       return await readFile(path.join(blobDir, id))

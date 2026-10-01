@@ -22,11 +22,28 @@ export function haversineMeters(a, b) {
   return 6371000 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h))
 }
 
+function instant(value) {
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value.getTime()
+  if (!value) return null
+  const parsed = Date.parse(value)
+  return Number.isNaN(parsed) ? null : parsed
+}
+
+export function calendarDay(value) {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString().slice(0, 10)
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{4}-\d{2}-\d{2})/)
+    if (match) return match[1]
+    const parsed = Date.parse(value)
+    if (!Number.isNaN(parsed)) return new Date(parsed).toISOString().slice(0, 10)
+  }
+  return null
+}
+
 export function minutesBetween(earlier, later) {
-  if (!earlier || !later) return null
-  const start = Date.parse(earlier)
-  const end = Date.parse(later)
-  if (Number.isNaN(start) || Number.isNaN(end)) return null
+  const start = instant(earlier)
+  const end = instant(later)
+  if (start == null || end == null) return null
   return Math.abs(end - start) / 60000
 }
 
@@ -70,10 +87,17 @@ function applyEstimates(moments) {
 }
 
 export function clusterPhotos(photos) {
-  const sorted = [...photos].sort((a, b) => String(a.takenAt || '9999').localeCompare(String(b.takenAt || '9999')))
+  const sorted = [...photos].sort((a, b) => {
+    const left = instant(a.takenAt)
+    const right = instant(b.takenAt)
+    if (left == null && right == null) return 0
+    if (left == null) return 1
+    if (right == null) return -1
+    return left - right
+  })
   const groups = new Map()
   for (const photo of sorted) {
-    const key = photo.takenAt ? String(photo.takenAt).slice(0, 10) : 'undated'
+    const key = calendarDay(photo.takenAt) || 'undated'
     if (!groups.has(key)) groups.set(key, [])
     groups.get(key).push(photo)
   }

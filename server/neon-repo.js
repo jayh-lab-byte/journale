@@ -59,6 +59,11 @@ function mapJourney(row) {
   }
 }
 
+function isoTimestamp(value) {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString()
+  return value || null
+}
+
 function mapPhoto(row) {
   return {
     id: row.id,
@@ -66,7 +71,7 @@ function mapPhoto(row) {
     momentId: row.moment_id,
     blobUrl: row.blob_url,
     filename: row.filename,
-    takenAt: row.taken_at,
+    takenAt: isoTimestamp(row.taken_at),
     latitude: row.latitude,
     longitude: row.longitude,
     width: row.width,
@@ -248,6 +253,11 @@ export const neonRepo = {
     await query('DELETE FROM photo_chunks WHERE journey_id = $1 AND upload_id = $2', [journeyId, uploadId])
   },
 
+  async photoByteLength(id) {
+    const rows = await query('SELECT octet_length(content) AS size FROM photos WHERE id = $1', [id])
+    return Number(rows[0]?.size || 0)
+  },
+
   async readPhotoBytes(id) {
     const rows = await query('SELECT content FROM photos WHERE id = $1', [id])
     const content = rows[0]?.content
@@ -296,7 +306,7 @@ export const neonRepo = {
         await client.query(
           `INSERT INTO days (id, journey_id, day_number, date, title)
            VALUES ($1,$2,$3,$4,$5)`,
-          [day.id, journeyId, day.dayNumber, day.date, day.title],
+          [day.id, journeyId, day.dayNumber, /^\d{4}-\d{2}-\d{2}$/.test(day.date || '') ? day.date : null, day.title],
         )
       }
       for (const moment of payload.moments) {
