@@ -1,0 +1,187 @@
+<!DOCTYPE html><html lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_tab" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"tertiary-fixed":"#e8e2da","primary-fixed":"#ffdbce","surface-dim":"#ddd9d7","outline-variant":"#dec0b6","on-tertiary":"#ffffff","on-tertiary-fixed":"#1d1b17","surface-variant":"#e6e2df","error-container":"#ffdad6","tertiary-container":"#736f69","outline":"#8a7269","surface-bright":"#fdf8f6","on-primary":"#ffffff","on-secondary":"#ffffff","on-primary-container":"#fff2ee","on-error":"#ffffff","background":"#fdf8f6","on-secondary-container":"#496a52","secondary-fixed-dim":"#abcfb2","surface-container-highest":"#e6e2df","on-error-container":"#93000a","inverse-on-surface":"#f4f0ee","on-surface-variant":"#57423b","secondary-container":"#c4e9cb","on-tertiary-container":"#faf3ec","primary-container":"#b85024","primary":"#98390d","on-secondary-fixed":"#01210f","surface-tint":"#a13f14","inverse-primary":"#ffb59a","surface-container-low":"#f7f3f0","surface-container":"#f1edeb","surface":"#fdf8f6","secondary-fixed":"#c7ecce","on-primary-fixed-variant":"#802a00","on-surface":"#1c1b1a","secondary":"#45664e","on-tertiary-fixed-variant":"#494641","surface-container-lowest":"#ffffff","tertiary":"#5a5751","tertiary-fixed-dim":"#cbc6bf","on-background":"#1c1b1a","inverse-surface":"#31302f","error":"#ba1a1a","primary-fixed-dim":"#ffb59a","surface-container-high":"#ece7e5","on-primary-fixed":"#380d00","on-secondary-fixed-variant":"#2e4e37"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"margin":"4rem","margin-mobile":"1.5rem","gutter":"2rem","space-sm":"0.5rem","space-lg":"1.75rem","space-xs":"0.25rem","gutter-mobile":"1rem","space-md":"1rem","space-xl":"3rem"},"fontFamily":{"headline-md":["Newsreader"],"headline-xl-mobile":["Newsreader"],"headline-xl":["Newsreader"],"display-hero":["Newsreader"],"headline-lg":["Newsreader"],"body-muted":["Plus Jakarta Sans"],"body-default":["Plus Jakarta Sans"],"label-ui":["Plus Jakarta Sans"],"body-editorial":["Newsreader"],"label-caps":["Plus Jakarta Sans"],"display-hero-mobile":["Newsreader"],"caption":["Plus Jakarta Sans"]},"fontSize":{"headline-md":["22px",{"lineHeight":"30px","fontWeight":"400"}],"headline-xl-mobile":["30px",{"lineHeight":"38px","letterSpacing":"-0.01em","fontWeight":"400"}],"headline-xl":["40px",{"lineHeight":"48px","letterSpacing":"-0.015em","fontWeight":"400"}],"display-hero":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"400"}],"headline-lg":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"400"}],"body-muted":["14px",{"lineHeight":"22px","fontWeight":"400"}],"body-default":["15px",{"lineHeight":"24px","fontWeight":"400"}],"label-ui":["13px",{"lineHeight":"18px","letterSpacing":"0.01em","fontWeight":"500"}],"body-editorial":["20px",{"lineHeight":"32px","fontWeight":"400"}],"label-caps":["11px",{"lineHeight":"16px","letterSpacing":"0.12em","fontWeight":"600"}],"display-hero-mobile":["38px",{"lineHeight":"46px","letterSpacing":"-0.015em","fontWeight":"400"}],"caption":["12px",{"lineHeight":"18px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface text-on-surface flex flex-col min-h-screen antialiased"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex flex-col"><span class="font-headline-md text-headline-md tracking-wider text-on-surface">JOURNALE</span><span class="font-label-caps text-label-caps uppercase tracking-[0.14em] text-on-surface-variant">Create Journey</span></div><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface"><div class="flex flex-col w-full px-margin-mobile pb-space-xl">
+<!-- Minimal Top Navigation Bar -->
+<div class="flex items-center justify-between py-space-md">
+<button aria-label="Cancel Journey Creation" class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+<span class="font-label-caps text-label-caps uppercase tracking-[0.16em] text-outline">Anthology Setup</span>
+<div class="w-10"></div>
+</div>
+<!-- Editorial Headline Section -->
+<div class="mt-space-sm mb-space-lg">
+<h1 class="font-headline-xl-mobile text-headline-xl-mobile text-on-surface tracking-tight">Create a Journey</h1>
+<p class="font-body-default text-body-default text-on-surface-variant mt-space-xs leading-relaxed max-w-sm">Choose the photos from one trip. We’ll organize the days, places, moments, and story.</p>
+</div>
+<!-- Primary Drag & Drop / Photo Target Zone -->
+<div class="relative group cursor-pointer bg-surface-container-low hover:bg-surface-container transition-all duration-300 rounded-xl p-space-lg flex flex-col items-center justify-center text-center shadow-sm" id="drop-zone">
+<input accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" id="photo-upload-input" multiple="" type="file">
+<!-- Tactile Icon Pill -->
+<div class="w-14 h-14 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm mb-space-md group-hover:scale-105 transition-transform duration-300">
+<span class="material-symbols-outlined text-primary text-[28px]">add_photo_alternate</span>
+</div>
+<!-- Instructions & Value Proposition -->
+<div class="flex flex-col gap-1.5 items-center">
+<span class="font-headline-md text-headline-md text-on-surface">Select Travel Photos</span>
+<span class="font-body-muted text-body-muted text-on-surface-variant max-w-xs">
+        JPG, PNG, HEIC from your camera roll · EXIF timestamps &amp; GPS read locally on your device
+      </span>
+</div>
+<!-- Visual Paper Badge -->
+<div class="mt-space-md inline-flex items-center gap-1.5 px-3 py-1 bg-surface-container-highest rounded-full">
+<span class="material-symbols-outlined text-secondary text-[16px]">lock</span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Preview locally before upload</span>
+</div>
+</div>
+<!-- Processing / Reading Indicator (Ambient Micro-moment) -->
+<div class="mt-space-lg bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-on-surface">Timeline Extraction Complete</span>
+</div>
+<span class="font-caption text-caption text-outline">100% EXIF parsed</span>
+</div>
+<!-- Metadata Readout Pill Bar -->
+<div class="bg-surface-container-low rounded-lg p-space-sm flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-[18px] leading-snug text-on-surface">Berlin, Germany</span>
+<span class="font-label-caps text-label-caps tracking-wider text-primary font-semibold">428 Selected</span>
+</div>
+<p class="font-caption text-caption text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_month</span>
+        Apr 12 – Apr 21, 2026 · 3 Districts · 14 Vignettes detected
+      </p>
+</div>
+<!-- Photographic Preview Tray (12 Curated Plates) -->
+<div class="mt-space-md">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-label-caps uppercase tracking-widest text-outline">Curated Ingest Stream</span>
+<button class="font-label-caps text-label-caps uppercase text-primary hover:underline" id="select-all-btn" type="button">Reselect</button>
+</div>
+<div class="grid grid-cols-4 gap-2">
+<!-- Thumbnail 1 -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Warm natural light on brutalist concrete architecture in Berlin Mitte, fine film grain, editorial travel photography, muted earth tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaM-39kSw8sRonTuF8Pm7HyLQ4i8Mif25lagZQektnpV2m0s3kpd9UeVGstX_4A5oQthNvPkgbjqjdWeo-GWE4DTNQraExRi3eNWihjVSaEbJa_-FURWUOFBIgMlvJxIrWymC-1gWSqYlrGxiC22_EjkH9yrhpCWzRc7a6QKfRDsfN6wmzqhs0kupnVIIQZm-x4Mqg38q2FoRsbcN65SMO6k963V650yOfbK_RcCE0DyWubqityOlhRg">
+<span class="absolute bottom-1 right-1 bg-surface/85 backdrop-blur-sm px-1 py-0.5 rounded text-[9px] font-caption text-on-surface">09:14</span>
+</div>
+<!-- Thumbnail 2 -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Minimalist specialty coffee cup on raw light oak table in an understated Berlin cafe, gentle morning sun shafts, tactile linen texture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDbmj-ZKkallZEvKAETNUwt307fwffHbuqKc8R3OPcqMB0J-DFaWc6ZiYXgWSWBqShFhG1sHzOIrgezSfeAYjVDARehHKW1dQ6DQ0e2sr8z7ZDW0KuJyqFuXYJhcDX1Lr2qYniduJfDzVRxQfcLWTBezvXMEUNYQJrq2DQTY6tiA-ZKU4xRLUxzChj_knY3kjngrtLbxaVRYiXCPH6GC8awckGhOwlSTdq2UYQk7Mx6pwulNzlokWRSw">
+<span class="absolute bottom-1 right-1 bg-surface/85 backdrop-blur-sm px-1 py-0.5 rounded text-[9px] font-caption text-on-surface">10:48</span>
+</div>
+<!-- Thumbnail 3 -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Monochrome textured facade of Museum Island gallery columns in Berlin, quiet architectural perspective, soft daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuByiDUnrmuC4RxMvp-t6evjq9lsZSLpaT37bju_Xe1wOoS9VlnBYHDddjNr19NybjwV7X-0ziyakre5izgc-26R1b0obBBW7WssRy84Kz3wwZfsR-RtYEHv_sXqDtUsMbarasb7cx1CLW5iPafbczYUFlNU2gOBQ3IHPNiSKblQ1LOtwn9QzlNf9mLrW8GsdwyPbmxFeXpjO_K8N3RnsTnlMJt4DLGUwSkxWPlFx8UhriBW3B6-fmH_Rg">
+<span class="absolute bottom-1 right-1 bg-surface/85 backdrop-blur-sm px-1 py-0.5 rounded text-[9px] font-caption text-on-surface">12:30</span>
+</div>
+<!-- Thumbnail 4 -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Spree river waters at dusk reflecting warm amber streetlights and distant pedestrian bridge in Berlin, documentary fine art style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_r-IamXFfJEq5AI7KWcgIW0_uzZ_P856-NYwgCqY0HCg7zrpCAY9n4rKt2qUFxSYd6cjZCrEN_Lj08cLc6EHvkeNYVJAiYf69RszvJMvQpbSpYj7wTpVTdvqhJX4A0u4ipEnXwN9p87U6scCLu2kUQk6oTQ37kFDRlzQPpxo1AEePl2apV0qauUTzljmbSKaaNzeEzVJ8jGWc2J9pXnN9YBx-M8R_D03GGrmPToWzBsTw4ZaNB8FqjQ">
+<span class="absolute bottom-1 right-1 bg-surface/85 backdrop-blur-sm px-1 py-0.5 rounded text-[9px] font-caption text-on-surface">17:15</span>
+</div>
+<!-- Thumbnail 5 -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Lush green canopy and quiet gravel pathway in Tiergarten Berlin, soft misty morning light, quiet cinematic atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOkVeYGKBs6Nvi5mF6CAq4t80OsjZJzlJ_gdhc1dLcJW50TSXM5hYg0ne-ufsZeNEHJPhzbRCKNT6OQCt9TJXNjBTKjcsj7EVhHAlSCDn6C4qvy9kkcwORXYj7X1nm3qrb3NHRw25k62_n4YB3TEL6Xfk6xirbrKapGRpAzzbi3BGGzPZMLtP33I5Sb7gMB0U2pCUVYaVyAGfXgDJgqD5rG9PZtgjkgoWItwNjgByIpBzAyOfW7vV4_w">
+<span class="absolute bottom-1 right-1 bg-surface/85 backdrop-blur-sm px-1 py-0.5 rounded text-[9px] font-caption text-on-surface">08:02</span>
+</div>
+<!-- Thumbnail 6 -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Vintage flea market vinyl records in weathered cardboard crates, Mauerpark Berlin, rich warm sepia tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUqmlA4kH2QY61w1ubKRCQAyvZY5gQC4L31QVVNUJftkYARSqxaei3179EFNMDhiOk2uz9KeRZ9nZHD17D2jLzKXxRy6-W60lR6aO62-s5XsDJaCRwmZNhDQVMgFqaQ3sBhrs84OwnxSJ1u6NbA3zf5QYIQUOWD4P-AB1A-e92Y0B1jTb1FtUKqXXPzYtGsM_rnCiFGE_Sj63giLvxriyIPkb5PtVxOZSwmJSJu57U_eTp-IK2D2XbIw">
+<span class="absolute bottom-1 right-1 bg-surface/85 backdrop-blur-sm px-1 py-0.5 rounded text-[9px] font-caption text-on-surface">13:22</span>
+</div>
+<!-- Thumbnail 7 -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="U-Bahn station yellow vintage train car pulling into an archway platform in Kreuzberg Berlin, soft directional station glow." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhzJIBs5dpmvOfTeg96JUchlfyJyS5_44LM8jf0qhGu12ZOnVlmo1JcrUtNnDGKgqetEFSsiv-UqhGXWlYlHydDQD96GwX6KujkGb99kD946yvYjo5-YhjxkCL-RXDBwzaPKv03E475TimCgkb1x65CExNqkT-lKPd0G78OkBJjEOkiLclxqBsTZuey3KbMTnHGCHGkur0Dx4NO8IQMRZpht5pb2SHEwCZoqrNz_m72XS1eedbou6EJw">
+<span class="absolute bottom-1 right-1 bg-surface/85 backdrop-blur-sm px-1 py-0.5 rounded text-[9px] font-caption text-on-surface">15:40</span>
+</div>
+<!-- Thumbnail 8 -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Minimalist typography on weathered gallery exhibition poster on concrete wall in Prenzlauer Berg, editorial aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAttWrzCN52BN1gF0tta8EksYHZjFpPe6ExWp0LPK3dmy3aM3wOTwjYHzoYzRbPYGzBIShjT0YrTG1izkkMrzcuxWY9PzBEKpSJ5WV42tkES4dxV2IxKHAmDLw1xJMq_sYCDZwJxhGU9O8AtOM4KB4gCkWQc9NbAlFnfWoG6_Db_b1y2H4KHf_zYyWvkn1jibQ-S-owHaKf7rDObwOzM20j2oL3N2F7qx3V0M5ZUkZHrJ8kx-Vvm-RHVg">
+<span class="absolute bottom-1 right-1 bg-surface/85 backdrop-blur-sm px-1 py-0.5 rounded text-[9px] font-caption text-on-surface">16:05</span>
+</div>
+<!-- Thumbnail 9 -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Intimate candlelit dining table with rustic artisan bread and ceramic wine carafe in Berlin Neukolln, warm dim light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoN_w1ntme5WCDwv_iEpzGM7D51IDVF38m3l3cdgj2oBgtfDAq5BBmVfPG_Fxnj_1JlTws8DB5FpB_AiM9wmpcKqzkHWpXabCq0cYdjV2ytMuYVNr1cqaKIVkghx9wLK0bs0iCC6AKpuqEDKlXrzix5YWr8zrFt1Bf-_H6xi9i5WTbKZwYDVtAsRBh-7jOktgscQfny_BSBJwsPOIHyh1mOZ-Yfg42zIO8AE3USejg0mBu0KHdauOESw">
+<span class="absolute bottom-1 right-1 bg-surface/85 backdrop-blur-sm px-1 py-0.5 rounded text-[9px] font-caption text-on-surface">20:10</span>
+</div>
+<!-- Thumbnail 10 -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Grand spiral staircase inside a modern Berlin art institution, high contrast architectural geometry, clean light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_6v7IQ8ordgpI0muo4vQIlhHbj3kX1nslcvE_B5MjcwTWIZ4aNuoBVECdnib9eLO2h9bguHf4-Udrn4E_bAdV-Emtr-Lwrb3peNcFD-fKqW7A6c7apetuUaqMIAuTfs75NNBwOLIEo1d3gMu2fnZpZOkOo3rMihP5h-3KgqxwVQ0JHJ5MPduvzm-yhzZVLJu_H2cjvCrqrqIqsd1xm0gtvJb1IbsLF3kWly4c1JulOVplJarHUVN6Yw">
+<span class="absolute bottom-1 right-1 bg-surface/85 backdrop-blur-sm px-1 py-0.5 rounded text-[9px] font-caption text-on-surface">11:18</span>
+</div>
+<!-- Thumbnail 11 -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Autumnal foliage leaning over vintage brick warehouse lofts in Friedrichshain Berlin, muted golden hour sunlight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7rFWZIYMp_BMQDiZ3r6Zy18e3MSEHos32BQmnJjzXkIeId_WDGCAdeKFY5Q7OTY3TxTdIFS4pUredorvbzrWF5I8PvHfC2YUB8yEugH91MXVBUXFbizDtTNF3XcGCmIaWiSz0sDYUUALYtmBp7xA2R9hvMjZpE0Oa2_6uD-2ONul-Y2wtzlOcZWhw2LqjUOyIoyHAudGiAuSBvb-XutLoPil5h3mv1Muvjg3DTgFr7ndnouW_o16c-Q">
+<span class="absolute bottom-1 right-1 bg-surface/85 backdrop-blur-sm px-1 py-0.5 rounded text-[9px] font-caption text-on-surface">18:45</span>
+</div>
+<!-- Thumbnail 12 (Overflow / Summary Card) -->
+<div class="aspect-square relative rounded-md overflow-hidden bg-surface-container-high flex flex-col items-center justify-center text-center p-1">
+<span class="font-headline-md text-headline-md text-on-surface leading-none">+416</span>
+<span class="font-label-caps text-[9px] tracking-wider uppercase text-outline mt-1">Frames</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary Action Container -->
+<div class="mt-space-lg flex flex-col gap-space-md">
+<button class="w-full bg-primary-container hover:bg-primary text-on-primary font-label-ui text-label-ui py-3.5 px-6 rounded-lg shadow-sm flex items-center justify-center gap-2 active:scale-[0.99] transition-all" id="reconstruct-btn" type="button">
+<span class="material-symbols-outlined text-[19px]">auto_awesome</span>
+<span class="font-semibold tracking-wide">Reconstruct Journey</span>
+</button>
+<!-- Curator Assurance Micro-quote -->
+<div class="bg-surface-container-low rounded-lg p-space-sm flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-[18px] mt-0.5">verified_user</span>
+<div class="flex flex-col"><span class="font-label-ui text-[12px] font-semibold text-on-surface">Private by Default</span><span class="font-caption text-caption text-on-surface-variant">Photo metadata is read on your device before reconstruction begins. Journeys are never shared unless you choose to share them.</span></div>
+</div>
+<!-- Quiet Exploration Link -->
+<div class="text-center mt-space-xs mb-space-sm">
+<a class="inline-flex items-center gap-1 font-body-muted text-body-muted text-on-surface-variant hover:text-on-surface transition-colors py-2" href="#">
+<span class="">Not ready yet? Explore a Sample Storybook</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const reconstructBtn = document.getElementById('reconstruct-btn');
+    const dropZone = document.getElementById('drop-zone');
+    const photoInput = document.getElementById('photo-upload-input');
+
+    if (reconstructBtn) {
+      reconstructBtn.addEventListener('click', () => {
+        const originalContent = reconstructBtn.innerHTML;
+        reconstructBtn.innerHTML = `
+          <svg class="animate-spin h-4 w-4 text-on-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="font-semibold tracking-wide">Synthesizing Anthology...</span>
+        `;
+        reconstructBtn.classList.add('opacity-90', 'pointer-events-none');
+
+        setTimeout(() => {
+          reconstructBtn.innerHTML = originalContent;
+          reconstructBtn.classList.remove('opacity-90', 'pointer-events-none');
+        }, 1600);
+      });
+    }
+
+    if (dropZone && photoInput) {
+      ['dragenter', 'dragover'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+          e.preventDefault();
+          dropZone.classList.add('bg-surface-container-high');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('bg-surface-container-high');
+        });
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.03)]" data-active-classes="text-primary font-semibold"><div class="flex justify-around items-center h-16 px-margin-mobile"><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-space-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="library" href="#"><span class="material-symbols-outlined text-[22px]">auto_stories</span><span class="font-label-caps text-label-caps tracking-widest uppercase mt-0.5">Library</span></a><a aria-current="page" aria-label="Create Journey" class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-space-sm text-primary font-semibold transition-colors" data-path="create-journey" href="#"><div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary shadow-sm active:scale-95 transition-transform"><span class="material-symbols-outlined text-[20px] text-on-primary">add</span></div><span class="font-label-caps text-label-caps tracking-widest uppercase mt-0.5">Create</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-space-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="account" href="#"><span class="material-symbols-outlined text-[22px]">tune</span><span class="font-label-caps text-label-caps tracking-widest uppercase mt-0.5">Account</span></a></div></nav></body></html>
