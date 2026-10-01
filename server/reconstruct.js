@@ -134,7 +134,7 @@ export async function draftInterviewPrompt({ title, bytes }) {
   const content = [
     {
       type: 'text',
-      text: `Place label: ${title || 'Unknown place'}. Look at the photograph and write one interview question plus a draft answer.`,
+      text: `Place label: ${title || 'Unknown place'}. The question is already "What do you remember about this photo?" Look at the photograph and write only a draft answer.`,
     },
   ]
   if (bytes?.length) {
@@ -158,7 +158,7 @@ export async function draftInterviewPrompt({ title, bytes }) {
         {
           role: 'system',
           content:
-            'You help a traveler remember a stop from one photograph. Return JSON with question and suggestion. The question is one short sentence about what is in the photo: a meal asks how it tasted, a view asks what they noticed, people ask who they were with, a street asks what they did there. Do not ask about time gaps or missing photos. The suggestion is a first-person draft of one or two sentences the traveler can edit. Base it on what is visible, and where taste or feeling is not visible, offer a gentle likely note rather than a blank. Do not invent names.',
+            'You help a traveler remember a stop from one photograph. Return JSON with suggestion only. The suggestion is a first-person draft of one or two sentences answering "What do you remember about this photo?" The traveler can keep it or edit it. Base it on what is visible, and where taste or feeling is not visible, offer a gentle likely note rather than a blank. Do not invent names. Do not write a question.',
         },
         { role: 'user', content },
       ],
@@ -167,10 +167,9 @@ export async function draftInterviewPrompt({ title, bytes }) {
   if (!response.ok) return null
   const data = await response.json()
   const parsed = JSON.parse(data.choices?.[0]?.message?.content || '{}')
-  const question = String(parsed.question || '').trim().slice(0, 240)
   const suggestion = String(parsed.suggestion || '').trim().slice(0, 600)
-  if (!question || !suggestion) return null
-  return { question, suggestion }
+  if (!suggestion) return null
+  return { suggestion }
 }
 
 export async function reconstructJourney(journeyId) {

@@ -4,6 +4,7 @@ import { api } from '../lib/api.js'
 import { formatDayLabel, formatTime } from '../lib/format.js'
 import { shrinkForPrompt } from '../lib/resize.js'
 import { Notice } from '../components/Shell.jsx'
+import { INTERVIEW_QUESTION } from '../../shared/questions.js'
 
 export function Interview() {
   const { id } = useParams()
@@ -134,34 +135,30 @@ export function Interview() {
             }}
           >
             <p className="meta">Question {Math.min(index, questions.length - 1) + 1} of {questions.length}</p>
+            <h2>{INTERVIEW_QUESTION}</h2>
             {drafting && !current.suggestion ? (
               <div className="prompt-loading" role="status" aria-live="polite" aria-busy="true">
-                <p className="meta">Looking at this photo…</p>
-                <div className="shimmer line question" />
-                <div className="shimmer line short" />
                 <span className="meta">Suggested answer</span>
                 <div className="shimmer block" />
+                <span className="faint">Writing a draft from this photo…</span>
               </div>
             ) : (
-              <div className="prompt-ready">
-                <h2>{current.question}</h2>
-                <label className="stack">
-                  <span className="meta">Suggested answer</span>
-                  <textarea
-                    value={answer}
-                    onChange={(event) => {
-                      edited.current = true
-                      setAnswer(event.target.value)
-                    }}
-                    maxLength={2000}
-                    placeholder="A draft will appear from the photo. Change anything that isn't right."
-                  />
-                  <span className="faint">Written from the photo. Edit anything that isn't right, then save.</span>
-                </label>
-              </div>
+              <label className="stack prompt-ready">
+                <span className="meta">Suggested answer</span>
+                <textarea
+                  value={answer}
+                  onChange={(event) => {
+                    edited.current = true
+                    setAnswer(event.target.value)
+                  }}
+                  maxLength={2000}
+                  placeholder="A draft will appear from the photo. Change anything that isn't right."
+                />
+                <span className="faint">Already written from the photo. Edit it, or press Next to keep it.</span>
+              </label>
             )}
             <div className="actions">
-              <button className="button" type="submit" disabled={pending || drafting}>Save</button>
+              <button className="button" type="submit" disabled={pending || drafting || !answer.trim()}>Next</button>
               <button className="ghost" type="button" disabled={pending || drafting} onClick={() => submit(true)}>Skip</button>
               <Link className="text-link" to={`/journeys/${id}`}>Back to Story</Link>
             </div>

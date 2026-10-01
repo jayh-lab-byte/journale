@@ -347,12 +347,11 @@ export const fileRepo = {
     })
   },
 
-  async setMemoryPrompt(momentId, memoryId, { question, suggestion }) {
+  async setMemoryPrompt(momentId, memoryId, { suggestion }) {
     return withLock(async () => {
       const store = await readStore()
       const memory = store.memories.find((item) => item.id === memoryId && item.momentId === momentId)
       if (!memory) return null
-      memory.question = question
       memory.suggestion = suggestion
       memory.updatedAt = now()
       await writeStore(store)

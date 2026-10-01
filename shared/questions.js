@@ -1,12 +1,6 @@
 import { hasGps, minutesBetween } from './cluster.js'
 
-const QUESTIONS = {
-  many: 'You took many photos here. What made this place memorable?',
-  long: 'You stayed here for a while. What do you remember most about this stop?',
-  gap: 'There is a long gap before this stop. Do you remember what happened?',
-  unknown: 'This place is still unclear. What do you remember about this stop?',
-  default: 'What do you remember most about this stop?',
-}
+export const INTERVIEW_QUESTION = 'What do you remember about this photo?'
 
 function reasonFor(moment, previous) {
   const duration = minutesBetween(moment.startedAt, moment.endedAt) || 0
@@ -41,7 +35,7 @@ export function selectQuestions(days) {
   }
   return picked.slice(0, 5).map((item) => ({
     momentKey: item.moment.key,
-    question: QUESTIONS[item.reason] || QUESTIONS.default,
+    question: INTERVIEW_QUESTION,
   }))
 }
 

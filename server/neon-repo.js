@@ -413,12 +413,12 @@ export const neonRepo = {
     return null
   },
 
-  async setMemoryPrompt(momentId, memoryId, { question, suggestion }) {
+  async setMemoryPrompt(momentId, memoryId, { suggestion }) {
     await query(
       `UPDATE memories
-       SET question = $3, suggestion = $4, updated_at = now()
+       SET suggestion = $3, updated_at = now()
        WHERE id = $1 AND moment_id = $2`,
-      [memoryId, momentId, question, suggestion],
+      [memoryId, momentId, suggestion],
     )
   },
 
