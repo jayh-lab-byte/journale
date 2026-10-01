@@ -22,6 +22,14 @@ async function ensureSchema() {
       const client = getPool()
       await client.query(sql)
       await client.query('ALTER TABLE photos ADD COLUMN IF NOT EXISTS content bytea')
+      await client.query(`CREATE TABLE IF NOT EXISTS photo_chunks (
+        upload_id text NOT NULL,
+        journey_id uuid NOT NULL REFERENCES journeys (id) ON DELETE CASCADE,
+        chunk_index integer NOT NULL,
+        total_count integer NOT NULL,
+        content bytea NOT NULL,
+        PRIMARY KEY (upload_id, chunk_index)
+      )`)
     })().catch((err) => {
       schemaReady = null
       throw err
@@ -213,6 +221,31 @@ export const neonRepo = {
   async getPhoto(id) {
     const rows = await query(`SELECT ${PHOTO_COLUMNS} FROM photos WHERE id = $1`, [id])
     return rows[0] ? mapPhoto(rows[0]) : null
+  },
+
+  async saveChunk({ journeyId, uploadId, index, total, bytes }) {
+    await query(
+      `INSERT INTO photo_chunks (upload_id, journey_id, chunk_index, total_count, content)
+       VALUES ($1,$2,$3,$4,$5)
+       ON CONFLICT (upload_id, chunk_index)
+       DO UPDATE SET content = EXCLUDED.content, total_count = EXCLUDED.total_count`,
+      [uploadId, journeyId, index, total, bytes],
+    )
+  },
+
+  async listChunks(journeyId, uploadId) {
+    const rows = await query(
+      'SELECT chunk_index, content FROM photo_chunks WHERE journey_id = $1 AND upload_id = $2 ORDER BY chunk_index ASC',
+      [journeyId, uploadId],
+    )
+    return rows.map((row) => ({
+      index: row.chunk_index,
+      bytes: Buffer.isBuffer(row.content) ? row.content : Buffer.from(row.content),
+    }))
+  },
+
+  async deleteChunks(journeyId, uploadId) {
+    await query('DELETE FROM photo_chunks WHERE journey_id = $1 AND upload_id = $2', [journeyId, uploadId])
   },
 
   async readPhotoBytes(id) {

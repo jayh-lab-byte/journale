@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api } from '../lib/api.js'
+import { api, uploadPhoto } from '../lib/api.js'
 import { clearDraft, getDraft, rememberJourney, rememberedJourney, shareInflight } from '../lib/draft.js'
 import { Notice } from '../components/Shell.jsx'
 
@@ -45,10 +45,7 @@ export function Reconstruct() {
         for (const item of files) {
           if (uploadedKeys.current.has(item.key)) continue
           try {
-            const form = new FormData()
-            form.append('file', item.file)
-            form.append('meta', JSON.stringify({ ...item.meta, filename: item.name }))
-            await api(`/api/journeys/${id}/photos`, { method: 'POST', form })
+            await uploadPhoto(id, item)
             uploadedKeys.current.add(item.key)
             done += 1
             setUploaded(done)

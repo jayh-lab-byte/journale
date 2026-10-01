@@ -133,7 +133,7 @@ async function readPhotoMeta(request) {
   if (file.type && !IMAGE_TYPES.has(file.type)) {
     return { invalid: 'Use a JPG or PNG photo. HEIC is attempted when the browser can read it.' }
   }
-  if (file.size > 15 * 1024 * 1024) return { invalid: 'Each photo needs to be under 15 MB.' }
+  if (file.size > 20 * 1024 * 1024) return { invalid: 'Each photo needs to be under 20 MB.' }
   const bytes = Buffer.from(await file.arrayBuffer())
   return {
     bytes,
@@ -160,7 +160,7 @@ async function handleBlob(request) {
       onBeforeGenerateToken: async () => ({
         allowedContentTypes: ['image/jpeg', 'image/png', 'image/heic', 'image/heif'],
         addRandomSuffix: true,
-        maximumSizeInBytes: 15 * 1024 * 1024,
+        maximumSizeInBytes: 20 * 1024 * 1024,
       }),
       onUploadCompleted: async () => {},
     })
@@ -220,7 +220,10 @@ export async function handle(request) {
       if (method === 'PATCH') return patchJourney(request, parts[2])
       if (method === 'DELETE') return removeJourney(request, parts[2])
     }
-    if (parts[1] === 'journeys' && parts[3] === 'photos' && method === 'POST') {
+    if (parts[1] === 'journeys' && parts[3] === 'photos' && parts[4] === 'chunks' && method === 'POST') {
+      return addPhotoChunk(request, parts[2])
+    }
+    if (parts[1] === 'journeys' && parts[3] === 'photos' && parts.length === 4 && method === 'POST') {
       return addPhoto(request, parts[2])
     }
     if (parts[1] === 'journeys' && parts[3] === 'reconstruct' && method === 'POST') {
@@ -309,6 +312,52 @@ async function removeJourney(request, id) {
   if (result.response) return result.response
   await result.repo.deleteJourney(id)
   return json({ ok: true })
+}
+
+async function addPhotoChunk(request, id) {
+  const result = await ownedJourney(request, id)
+  if (result.response) return result.response
+  const form = await request.formData()
+  const uploadId = String(form.get('uploadId') || '')
+  const index = Number(form.get('index'))
+  const total = Number(form.get('total'))
+  const chunk = form.get('chunk')
+  if (!/^[0-9a-f-]{36}$/i.test(uploadId)) return error('VALIDATION_ERROR', 'That photo could not be saved.', 400)
+  if (!Number.isInteger(index) || !Number.isInteger(total) || total < 2 || total > 8 || index < 0 || index >= total) {
+    return error('VALIDATION_ERROR', 'That photo could not be saved.', 400)
+  }
+  if (!chunk || typeof chunk.arrayBuffer !== 'function' || chunk.size > 3.5 * 1024 * 1024) {
+    return error('VALIDATION_ERROR', 'That photo could not be saved.', 400)
+  }
+  let meta = {}
+  try {
+    meta = JSON.parse(typeof form.get('meta') === 'string' ? form.get('meta') : '{}')
+  } catch {
+    return error('VALIDATION_ERROR', 'That photo could not be saved.', 400)
+  }
+  const bytes = Buffer.from(await chunk.arrayBuffer())
+  await result.repo.saveChunk({ journeyId: id, uploadId, index, total, bytes })
+  const saved = await result.repo.listChunks(id, uploadId)
+  if (saved.length < total) return json({ received: saved.length, total })
+  const ordered = [...saved].sort((a, b) => a.index - b.index)
+  if (ordered.some((item, position) => item.index !== position)) return json({ received: saved.length, total })
+  const photoBytes = Buffer.concat(ordered.map((item) => item.bytes))
+  if (photoBytes.length > 20 * 1024 * 1024) {
+    await result.repo.deleteChunks(id, uploadId)
+    return error('VALIDATION_ERROR', 'Each photo needs to be under 20 MB.', 400)
+  }
+  const photo = await result.repo.addPhoto({
+    journeyId: id,
+    bytes: photoBytes,
+    filename: cleanText(meta.filename || chunk.name || 'photo', 180),
+    takenAt: typeof meta.takenAt === 'string' ? meta.takenAt : null,
+    latitude: numberOrNull(meta.latitude),
+    longitude: numberOrNull(meta.longitude),
+    width: numberOrNull(meta.width),
+    height: numberOrNull(meta.height),
+  })
+  await result.repo.deleteChunks(id, uploadId)
+  return json({ photo: presentPhoto(photo) }, 201)
 }
 
 async function addPhoto(request, id) {

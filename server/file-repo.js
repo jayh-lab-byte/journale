@@ -1,10 +1,11 @@
-import { mkdir, readFile, writeFile, rm } from 'node:fs/promises'
+import { mkdir, readFile, writeFile, rm, readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { createId } from './http.js'
 
 const root = path.resolve('data')
 const storePath = path.join(root, 'store.json')
 const blobDir = path.join(root, 'blobs')
+const chunkRoot = path.join(root, 'chunks')
 
 const empty = () => ({
   journeys: [],
@@ -185,6 +186,45 @@ export const fileRepo = {
       const store = await readStore()
       return store.photos.find((photo) => photo.id === id) || null
     })
+  },
+
+  async saveChunk({ journeyId, uploadId, index, total, bytes }) {
+    const dir = path.join(chunkRoot, uploadId)
+    await mkdir(dir, { recursive: true })
+    await writeFile(path.join(dir, `${index}.bin`), bytes)
+    await writeFile(path.join(dir, 'meta.json'), JSON.stringify({ journeyId, total }))
+  },
+
+  async listChunks(journeyId, uploadId) {
+    const dir = path.join(chunkRoot, uploadId)
+    let meta
+    try {
+      meta = JSON.parse(await readFile(path.join(dir, 'meta.json'), 'utf8'))
+    } catch {
+      return []
+    }
+    if (meta.journeyId !== journeyId) return []
+    const names = await readdir(dir)
+    const chunks = []
+    for (const name of names) {
+      if (!name.endsWith('.bin')) continue
+      chunks.push({
+        index: Number(name.slice(0, -4)),
+        bytes: await readFile(path.join(dir, name)),
+      })
+    }
+    return chunks
+  },
+
+  async deleteChunks(journeyId, uploadId) {
+    const dir = path.join(chunkRoot, uploadId)
+    try {
+      const meta = JSON.parse(await readFile(path.join(dir, 'meta.json'), 'utf8'))
+      if (meta.journeyId !== journeyId) return
+    } catch {
+      return
+    }
+    await rm(dir, { recursive: true, force: true })
   },
 
   async readPhotoBytes(id) {
