@@ -170,13 +170,22 @@ async function handleBlob(request) {
   }
 }
 
+function headerValue(request, name) {
+  const headers = request.headers
+  if (!headers) return ''
+  if (typeof headers.get === 'function') return headers.get(name) || ''
+  const value = headers[name] ?? headers[name.toLowerCase()]
+  if (Array.isArray(value)) return value[0] || ''
+  return value || ''
+}
+
 function requestUrl(request) {
   const raw = request.url || '/'
   try {
     return new URL(raw)
   } catch {
-    const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost'
-    const proto = request.headers.get('x-forwarded-proto') || 'https'
+    const host = headerValue(request, 'x-forwarded-host') || headerValue(request, 'host') || 'localhost'
+    const proto = headerValue(request, 'x-forwarded-proto') || 'https'
     return new URL(raw, `${proto}://${host}`)
   }
 }
