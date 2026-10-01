@@ -76,7 +76,7 @@ async function writeWithModel(days) {
       time: moment.startedAt,
       place: moment.title,
       confidence: moment.locationConfidence,
-      photoCount: moment.photos.length,
+      photoCount: moment.photos?.length || 0,
       visible: moment.visionDescription || '',
       memory: (moment.memories || []).find((memory) => memory.answer)?.answer || '',
     })),
@@ -300,22 +300,26 @@ export async function regenerateMomentStory(momentId) {
   }
   let story = draftMomentStory(draft)
   if (process.env.OPENAI_API_KEY) {
-    const parsed = await writeWithModel([
-      {
-        dayNumber: 1,
-        date: null,
-        moments: [
-          {
-            ...draft,
-            key: 'm0',
-            photos: moment.photos,
-            visionDescription: draft.visionDescription,
-          },
-        ],
-      },
-    ])
-    const text = parsed.days?.[0]?.moments?.find((item) => item.key === 'm0')?.story
-    if (text) story = String(text).trim().slice(0, 1200)
+    try {
+      const parsed = await writeWithModel([
+        {
+          dayNumber: 1,
+          date: null,
+          moments: [
+            {
+              ...draft,
+              key: 'm0',
+              photos: moment.photos || [],
+              visionDescription: draft.visionDescription,
+            },
+          ],
+        },
+      ])
+      const text = parsed.days?.[0]?.moments?.find((item) => item.key === 'm0')?.story
+      if (text) story = String(text).trim().slice(0, 1200)
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : 'Story rewrite failed')
+    }
   }
   await repo.updateMomentStory(momentId, story)
   return story

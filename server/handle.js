@@ -481,8 +481,8 @@ async function saveMemory(request, id) {
   await repo.saveMemory(id, { question: memory.question, answer: body.skip ? '' : answer })
   try {
     await regenerateMomentStory(id)
-  } catch {
-    return error('STORY_ERROR', 'Your memory was saved. The story could not be updated yet.', 502)
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : 'Story rewrite failed')
   }
   const journey = await repo.getJourney(moment.journeyId)
   return json({ journey: presentJourney(journey) })

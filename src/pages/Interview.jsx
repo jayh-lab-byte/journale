@@ -41,6 +41,8 @@ export function Interview() {
   const current = questions[Math.min(index, Math.max(questions.length - 1, 0))]
 
   useEffect(() => {
+    setNote('')
+    setError('')
     if (!current) return undefined
     edited.current = false
     if (current.suggestion) {
@@ -89,16 +91,12 @@ export function Interview() {
       })
       setJourney(data.journey)
       setAnswer('')
-      setNote(skip ? 'Question skipped.' : 'Memory saved.')
+      setError('')
+      setNote(skip ? '' : 'Memory saved.')
       setIndex(0)
     } catch (err) {
+      setNote('')
       setError(err.message)
-      if (err.code === 'STORY_ERROR') {
-        const data = await api(`/api/journeys/${id}`)
-        setJourney(data.journey)
-        setNote('Your memory was saved. The story can be retried from the story page.')
-        setAnswer('')
-      }
     } finally {
       setPending(false)
     }
