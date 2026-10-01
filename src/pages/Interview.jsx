@@ -29,7 +29,7 @@ export function Interview() {
   const questions = journey
     ? journey.days.flatMap((day) =>
         day.moments.flatMap((moment) =>
-          moment.memories
+          (moment.memories || [])
             .filter((memory) => memory.answer == null)
             .map((memory) => ({ ...memory, moment, day })),
         ),
@@ -80,10 +80,10 @@ export function Interview() {
       ) : (
         <div className="interview-layout">
           <figure className="hero-photo">
-            <img src={current.moment.photos[0]?.url} alt={current.moment.title || 'Related photograph'} />
+            <img src={current.moment.photos?.[0]?.url || ''} alt={current.moment.title || 'Related photograph'} />
             <figcaption>
               <span>{formatDayLabel(current.day.dayNumber, current.day.date)} · {formatTime(current.moment.startedAt)}</span>
-              <span>{current.moment.photos.length} photos</span>
+              <span>{current.moment.photos?.length || 0} photos</span>
             </figcaption>
             <p className="muted">{current.moment.title}</p>
           </figure>

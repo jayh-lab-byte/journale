@@ -40,19 +40,23 @@ export function Reconstruct() {
       }
       const problems = []
       if (upload) {
-        let done = uploadedKeys.current.size
+        const pending = files.filter((item) => !uploadedKeys.current.has(item.key))
         setTotal(files.length)
-        for (const item of files) {
-          if (uploadedKeys.current.has(item.key)) continue
-          try {
-            await uploadPhoto(id, item)
-            uploadedKeys.current.add(item.key)
-            done += 1
-            setUploaded(done)
-          } catch (err) {
-            problems.push({ ...item, message: err.message })
+        let cursor = 0
+        async function next() {
+          while (cursor < pending.length) {
+            const item = pending[cursor]
+            cursor += 1
+            try {
+              await uploadPhoto(id, item)
+              uploadedKeys.current.add(item.key)
+              setUploaded(uploadedKeys.current.size)
+            } catch (err) {
+              problems.push({ ...item, message: err.message })
+            }
           }
         }
+        await Promise.all(Array.from({ length: Math.min(3, pending.length) }, () => next()))
       }
       setFailed(problems)
       const savedCount = uploadedKeys.current.size

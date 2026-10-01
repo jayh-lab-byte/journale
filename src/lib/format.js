@@ -1,23 +1,26 @@
+function parseDay(date) {
+  if (!date) return null
+  const match = String(date).match(/^(\d{4})-(\d{2})-(\d{2})/)
+  const parsed = match
+    ? new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])))
+    : new Date(date)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+function formatUtc(date, options) {
+  const parsed = parseDay(date)
+  if (!parsed) return ''
+  return new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', ...options }).format(parsed)
+}
+
 export function formatDayLabel(dayNumber, date) {
   const number = String(dayNumber).padStart(2, '0')
-  if (!date) return `Day ${number} · Undated`
-  const parsed = new Date(`${date}T00:00:00Z`)
-  const pretty = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'UTC',
-    month: 'short',
-    day: 'numeric',
-  }).format(parsed)
-  return `Day ${number} · ${pretty}`
+  const pretty = formatUtc(date, { month: 'short', day: 'numeric' })
+  return pretty ? `Day ${number} · ${pretty}` : `Day ${number} · Undated`
 }
 
 export function formatWeekday(date) {
-  if (!date) return 'Undated'
-  return new Intl.DateTimeFormat('en-US', {
-    timeZone: 'UTC',
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-  }).format(new Date(`${date}T00:00:00Z`))
+  return formatUtc(date, { weekday: 'long', month: 'short', day: 'numeric' }) || 'Undated'
 }
 
 export function formatTime(iso) {
@@ -33,9 +36,9 @@ export function formatTime(iso) {
 
 export function formatRange(start, end) {
   if (!start && !end) return ''
-  const options = { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' }
-  const left = start ? new Intl.DateTimeFormat('en-US', options).format(new Date(start)) : ''
-  const right = end ? new Intl.DateTimeFormat('en-US', options).format(new Date(end)) : ''
+  const options = { month: 'short', day: 'numeric', year: 'numeric' }
+  const left = start ? formatUtc(start, options) : ''
+  const right = end ? formatUtc(end, options) : ''
   if (left && right && left !== right) return `${left} – ${right}`
   return left || right
 }

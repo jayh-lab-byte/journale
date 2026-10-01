@@ -59,6 +59,16 @@ function mapJourney(row) {
   }
 }
 
+function calendarDate(value) {
+  if (!value) return null
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    const pad = (part) => String(part).padStart(2, '0')
+    return `${value.getUTCFullYear()}-${pad(value.getUTCMonth() + 1)}-${pad(value.getUTCDate())}`
+  }
+  const match = String(value).match(/^(\d{4}-\d{2}-\d{2})/)
+  return match ? match[1] : null
+}
+
 function isoTimestamp(value) {
   if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString()
   return value || null
@@ -111,7 +121,7 @@ async function hydrate(journey) {
     id: day.id,
     journeyId: day.journey_id,
     dayNumber: day.day_number,
-    date: day.date ? String(day.date).slice(0, 10) : null,
+    date: calendarDate(day.date),
     title: day.title || '',
     createdAt: day.created_at,
     updatedAt: day.updated_at,

@@ -5,10 +5,6 @@ import { draftDayTitle, draftJourneyTitle, draftMomentStory } from '../shared/st
 import { createId } from './http.js'
 import { getRepo } from './repo.js'
 
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 function placeName(data) {
   const address = data?.address || {}
   const spot =
@@ -33,7 +29,7 @@ async function reverseGeocode(latitude, longitude) {
   url.searchParams.set('format', 'json')
   const response = await fetch(url, {
     headers: { 'user-agent': 'Journale/0.1 (educational travel storybook)', accept: 'application/json' },
-    signal: AbortSignal.timeout(4000),
+    signal: AbortSignal.timeout(2000),
   })
   if (!response.ok) return ''
   const data = await response.json()
@@ -52,7 +48,7 @@ async function namePlaces(days) {
       }
       const key = `${moment.latitude.toFixed(3)},${moment.longitude.toFixed(3)}`
       if (!cache.has(key)) {
-        if (lookups >= 12) {
+        if (lookups >= 6) {
           cache.set(key, '')
         } else {
           lookups += 1
@@ -61,7 +57,6 @@ async function namePlaces(days) {
           } catch {
             cache.set(key, '')
           }
-          await delay(250)
         }
       }
       const name = cache.get(key)
@@ -70,49 +65,6 @@ async function namePlaces(days) {
     }
   }
   return named
-}
-
-function photoMime(filename = '') {
-  const lower = filename.toLowerCase()
-  if (lower.endsWith('.png')) return 'image/png'
-  if (lower.endsWith('.webp')) return 'image/webp'
-  if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg'
-  return ''
-}
-
-async function describePhoto(photo, bytes) {
-  const mime = photoMime(photo.filename)
-  if (!mime) return ''
-  let imageUrl = ''
-  if (bytes) imageUrl = `data:${mime};base64,${Buffer.from(bytes).toString('base64')}`
-  else if (typeof photo.blobUrl === 'string' && photo.blobUrl.startsWith('http')) imageUrl = photo.blobUrl
-  if (!imageUrl) return ''
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      'content-type': 'application/json',
-    },
-    signal: AbortSignal.timeout(12000),
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      temperature: 0,
-      messages: [
-        {
-          role: 'system',
-          content:
-            'Describe only what is visible in the photograph. One calm sentence. Do not guess emotions, weather history, names, or events.',
-        },
-        {
-          role: 'user',
-          content: [{ type: 'image_url', image_url: { url: imageUrl } }],
-        },
-      ],
-    }),
-  })
-  if (!response.ok) return ''
-  const data = await response.json()
-  return String(data.choices?.[0]?.message?.content || '').trim().slice(0, 400)
 }
 
 async function writeWithModel(days) {
@@ -135,7 +87,7 @@ async function writeWithModel(days) {
       authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       'content-type': 'application/json',
     },
-    signal: AbortSignal.timeout(40000),
+    signal: AbortSignal.timeout(18000),
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       temperature: 0.2,
@@ -198,32 +150,6 @@ export async function reconstructJourney(journeyId) {
   }
   await namePlaces(days)
   const photoVision = []
-  if (process.env.OPENAI_API_KEY) {
-    let described = 0
-    for (const day of days) {
-      if (described >= 4) break
-      for (const moment of day.moments) {
-        if (described >= 4) break
-        const photo = moment.photos.find((item) => item.id === moment.representativeId) || moment.photos[0]
-        if (!photo) continue
-        try {
-          const size = typeof repo.photoByteLength === 'function' ? await repo.photoByteLength(photo.id) : 0
-          if (size > 900_000) continue
-          const bytes = photo.blobUrl?.startsWith('/api/media/') ? await repo.readPhotoBytes(photo.id) : null
-          if (bytes && bytes.length > 900_000) continue
-          described += 1
-          const description = await describePhoto(photo, bytes)
-          if (description) {
-            photo.visionDescription = description
-            moment.visionDescription = description
-            photoVision.push({ id: photo.id, visionDescription: description })
-          }
-        } catch {
-          photoVision.push({ id: photo.id, visionDescription: null })
-        }
-      }
-    }
-  }
   const questions = selectQuestions(days)
   let modelTitle = ''
   if (process.env.OPENAI_API_KEY) {
